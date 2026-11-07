@@ -1,0 +1,36 @@
+:root {
+    color-scheme: light;
+
+    --font-sans: system-ui, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+    --color-page: #f4f5f7;
+    --color-text: #1c1f24;
+    --color-accent: #335fff;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: radial-gradient(120% 80% at 50% 0%, #ffffff 0%, var(--color-page) 62%);
+    background-color: var(--color-page);
+    color: var(--color-text);
+    font-family: var(--font-sans);
+    line-height: 1.6;
+}
+
+button,
+input,
+select,
+textarea {
+    font: inherit;
+}
+
+:focus-visible {
+    outline: 3px solid;
+    outline-color: var(--color-accent);
+    outline-offset: 2px;
+}
