@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react';
+import { requestServer } from '../network/packets.ts';
+import { createServerUrl } from '../network/serverOptions.ts';
 
 export type Product = {
   readonly id: string;
@@ -8,6 +10,7 @@ export type Product = {
 export type SearchResult = {
   readonly keyword: string;
   readonly products: readonly Product[];
+  readonly suggestion: string | null;
 };
 
 export type SearchStatus = 'loading' | 'success' | 'failure';
@@ -20,6 +23,7 @@ type SearchRequest = {
 
 type SearchResponse = {
   readonly products: readonly Product[];
+  readonly suggestion: string | null;
 };
 
 const REQUEST_PAUSE_MILLISECONDS = 300;
@@ -27,7 +31,7 @@ const REQUEST_PAUSE_MILLISECONDS = 300;
 export function useProductSearch({ keyword, delayMilliseconds, shouldFail }: SearchRequest) {
   const [retryTrigger, setRetryTrigger] = useState(0);
   const [status, setStatus] = useState<SearchStatus>('loading');
-  const [result, setResult] = useState<SearchResult>({ keyword: '', products: [] });
+  const [result, setResult] = useState<SearchResult>({ keyword: '', products: [], suggestion: null });
 
   useEffect(
     function searchAfterPause() {
@@ -38,8 +42,8 @@ export function useProductSearch({ keyword, delayMilliseconds, shouldFail }: Sea
         setStatus('loading');
 
         try {
-          const url = createSearchUrl({ keyword, delayMilliseconds, shouldFail });
-          const response = await fetch(url, { signal: controller.signal });
+          const url = createServerUrl('/api/search', { delayMilliseconds, shouldFail }, { keyword });
+          const response = await requestServer('검색', url, { signal: controller.signal });
 
           if (!response.ok) {
             setStatus('failure');
@@ -47,7 +51,7 @@ export function useProductSearch({ keyword, delayMilliseconds, shouldFail }: Sea
           }
 
           const searchResponse: SearchResponse = await response.json();
-          setResult({ keyword, products: searchResponse.products });
+          setResult({ keyword, products: searchResponse.products, suggestion: searchResponse.suggestion });
           setStatus('success');
         } catch {
           if (!controller.signal.aborted) {
@@ -70,14 +74,4 @@ export function useProductSearch({ keyword, delayMilliseconds, shouldFail }: Sea
   }
 
   return { status, result, retrySearch };
-}
-
-function createSearchUrl({ keyword, delayMilliseconds, shouldFail }: SearchRequest): string {
-  const query = new URLSearchParams({
-    keyword,
-    delayMilliseconds: String(delayMilliseconds),
-    fail: String(shouldFail),
-  });
-
-  return `/api/search?${query}`;
 }

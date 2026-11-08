@@ -1,14 +1,15 @@
 import { useRef, useState } from 'react';
 import type { ChangeEvent } from 'react';
+import { ControlPanel } from '../controls/ControlPanel.tsx';
+import { ServerControls } from '../controls/ServerControls.tsx';
+import { describeServerOptions } from '../network/serverOptions.ts';
 import './searchCard.css';
 import { useProductSearch } from './useProductSearch.ts';
 import type { Product, SearchResult, SearchStatus } from './useProductSearch.ts';
 
-const DELAY_OPTIONS = [
-  { label: '없음', milliseconds: 0 },
-  { label: '1초', milliseconds: 1000 },
-  { label: '3초', milliseconds: 3000 },
-] as const;
+const FIRST_SYLLABLE_CODE = 0xac00;
+const LAST_SYLLABLE_CODE = 0xd7a3;
+const FINALS_PER_MEDIAL = 28;
 
 export function SearchCard() {
   const [searchText, setSearchText] = useState('');
@@ -26,40 +27,26 @@ export function SearchCard() {
     setSearchText(event.currentTarget.value);
   }
 
-  function updateDelay(event: ChangeEvent<HTMLSelectElement>) {
-    setDelayMilliseconds(Number(event.currentTarget.value));
-  }
-
-  function updateShouldFail(event: ChangeEvent<HTMLInputElement>) {
-    setShouldFail(event.currentTarget.checked);
-  }
-
   function retryFromSearchInput() {
     searchInputRef.current!.focus();
     retrySearch();
   }
 
+  function searchSuggestion(suggestion: string) {
+    setSearchText(suggestion);
+    searchInputRef.current!.focus();
+  }
+
   return (
     <div className="search-card">
-      <fieldset className="search-card-server">
-        <legend className="search-card-label-text">서버 조절</legend>
-        <label className="search-card-server-option">
-          응답 지연
-          <select value={delayMilliseconds} onChange={updateDelay}>
-            {DELAY_OPTIONS.map(function renderDelayOption(option) {
-              return (
-                <option key={option.milliseconds} value={option.milliseconds}>
-                  {option.label}
-                </option>
-              );
-            })}
-          </select>
-        </label>
-        <label className="search-card-server-option">
-          <input type="checkbox" checked={shouldFail} onChange={updateShouldFail} />
-          요청 실패시키기
-        </label>
-      </fieldset>
+      <ControlPanel summary={describeServerOptions(delayMilliseconds, shouldFail)}>
+        <ServerControls
+          delayMilliseconds={delayMilliseconds}
+          shouldFail={shouldFail}
+          changeDelay={setDelayMilliseconds}
+          changeShouldFail={setShouldFail}
+        />
+      </ControlPanel>
 
       <label className="search-card-label">
         <span className="search-card-label-text">상품 검색</span>
@@ -67,6 +54,7 @@ export function SearchCard() {
           ref={searchInputRef}
           className="search-card-input"
           type="search"
+          placeholder="예: 바나나"
           value={searchText}
           onChange={updateSearchText}
         />
@@ -76,7 +64,12 @@ export function SearchCard() {
         {describeStatus(status, result)}
       </output>
 
-      <SearchOutcome status={status} products={result.products} retrySearch={retryFromSearchInput} />
+      <SearchOutcome
+        status={status}
+        result={result}
+        retrySearch={retryFromSearchInput}
+        searchSuggestion={searchSuggestion}
+      />
     </div>
   );
 }
@@ -102,11 +95,12 @@ function describeProducts(result: SearchResult): string {
 
 type SearchOutcomeProps = {
   readonly status: SearchStatus;
-  readonly products: readonly Product[];
+  readonly result: SearchResult;
   readonly retrySearch: () => void;
+  readonly searchSuggestion: (suggestion: string) => void;
 };
 
-function SearchOutcome({ status, products, retrySearch }: SearchOutcomeProps) {
+function SearchOutcome({ status, result, retrySearch, searchSuggestion }: SearchOutcomeProps) {
   if (status === 'failure') {
     return (
       <button className="search-card-retry" type="button" onClick={retrySearch}>
@@ -115,13 +109,15 @@ function SearchOutcome({ status, products, retrySearch }: SearchOutcomeProps) {
     );
   }
 
-  if (products.length === 0) {
-    return null;
+  if (result.products.length === 0) {
+    return result.suggestion === null ? null : (
+      <SuggestionButton suggestion={result.suggestion} searchSuggestion={searchSuggestion} />
+    );
   }
 
   return (
     <ul className="search-card-results">
-      {products.map(function renderProduct(product) {
+      {result.products.map(function renderProduct(product: Product) {
         return (
           <li className="search-card-product" key={product.id}>
             {product.name}
@@ -130,4 +126,30 @@ function SearchOutcome({ status, products, retrySearch }: SearchOutcomeProps) {
       })}
     </ul>
   );
+}
+
+type SuggestionButtonProps = {
+  readonly suggestion: string;
+  readonly searchSuggestion: (suggestion: string) => void;
+};
+
+function SuggestionButton({ suggestion, searchSuggestion }: SuggestionButtonProps) {
+  function searchThisSuggestion() {
+    searchSuggestion(suggestion);
+  }
+
+  return (
+    <button className="search-card-suggestion" type="button" onClick={searchThisSuggestion}>
+      <strong>{suggestion}</strong>
+      {chooseObjectParticle(suggestion)} 입력하셨나요?
+    </button>
+  );
+}
+
+function chooseObjectParticle(word: string): string {
+  const lastCode = word.charCodeAt(word.length - 1);
+  const isHangulSyllable = lastCode >= FIRST_SYLLABLE_CODE && lastCode <= LAST_SYLLABLE_CODE;
+  const hasFinalConsonant = isHangulSyllable && (lastCode - FIRST_SYLLABLE_CODE) % FINALS_PER_MEDIAL !== 0;
+
+  return hasFinalConsonant ? '을' : '를';
 }

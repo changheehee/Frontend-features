@@ -3,23 +3,6 @@
     gap: 1.125rem;
 }
 
-.search-card-server {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.75rem 1.5rem;
-    margin: 0;
-    padding: 0.75rem 1rem;
-    border: 1px solid #d5d8de;
-    border-radius: 0.875rem;
-}
-
-.search-card-server-option {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
 .search-card-label {
     display: grid;
     gap: 0.5rem;
@@ -36,6 +19,14 @@
     border-radius: 0.875rem;
     background-color: #ffffff;
     color: inherit;
+}
+
+.search-card-input:hover {
+    border-color: #4b515c;
+}
+
+.search-card-input::placeholder {
+    color: #6b717c;
 }
 
 .search-card-results {
@@ -68,4 +59,22 @@
     color: #ffffff;
     font-weight: 600;
     cursor: pointer;
+}
+
+.search-card-suggestion {
+    justify-self: start;
+    padding: 0.4375rem 1rem;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    background-color: #eef2ff;
+    color: #1f3fd1;
+    cursor: pointer;
+}
+
+.search-card-suggestion:hover {
+    background-color: #e0e7ff;
+}
+
+.search-card-suggestion strong {
+    font-weight: 700;
 }

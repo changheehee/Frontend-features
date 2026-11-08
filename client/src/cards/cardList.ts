@@ -33,6 +33,8 @@ export const CARD_LIST: readonly CardEntry[] = [
     notes: [
       '입력을 0.3초 멈추면 요청하고, 그 전에 검색어가 바뀌면 이전 요청을 취소합니다.',
       '패널을 닫아도 진행 중인 요청을 취소합니다.',
+      '자모로 나눠 비교해서 입력 중인 “바나나ㅇ”도 바나나우유를 찾습니다.',
+      '결과가 없으면 가장 가까운 이름을 “○○를 입력하셨나요?”로 제안합니다.',
     ],
     flow: SEARCH_FLOW,
     Content: SearchCard,

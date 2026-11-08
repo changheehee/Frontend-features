@@ -13,11 +13,12 @@ export const SEARCH_FLOW: DataFlow = {
       label: 'GET /api/search?keyword=바나나',
       detail: '응답 지연·실패 설정도 함께 보냅니다',
     },
+    { type: 'note', side: 'right', text: '자모로 나눠 비교합니다 (바나나ㅇ → 바나나우유)' },
     {
       type: 'message',
       from: 'right',
-      label: '{ products }',
-      detail: '실패를 켜면 500',
+      label: '{ products, suggestion }',
+      detail: '결과가 없으면 가장 가까운 이름을 함께 보냅니다 · 실패를 켜면 500',
     },
     { type: 'note', side: 'left', text: '응답 전에 검색어가 바뀌거나 패널을 닫으면 abort()' },
     {
