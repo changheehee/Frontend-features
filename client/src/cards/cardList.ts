@@ -1,4 +1,8 @@
 import { lazy } from 'react';
+import { ChatCard } from './chat/ChatCard.tsx';
+import chatArt from './chat/chatArt.png';
+import { CHAT_FLOW } from './chat/chatFlow.ts';
+import chatIcon from './chat/chatIcon.svg';
 import type { CardEntry } from './frame/Card.tsx';
 import { PostCard } from './post/PostCard.tsx';
 import postArt from './post/postArt.png';
@@ -66,5 +70,21 @@ export const CARD_LIST: readonly CardEntry[] = [
     ],
     flow: POST_FLOW,
     Content: PostCard,
+  },
+  {
+    id: 'chat',
+    title: '채팅',
+    summary: '두 화면이 실시간으로 주고받고, 끊겼다 이어져도 순서를 지킵니다.',
+    art: chatArt,
+    icon: chatIcon,
+    tone: '#12a37f',
+    notes: [
+      '두 화면이 각자 SSE로 서버에 연결해 메시지를 실시간으로 받습니다.',
+      '보낸 메시지는 시계 → ✓ → ✓✓로 바뀌고, 실패하면 다시 보낼 수 있습니다.',
+      '연결이 끊긴 동안 쓴 메시지는 다시 연결되면 순서대로 보냅니다.',
+      '같은 메시지를 두 번 보내도 서버가 한 번만 저장합니다.',
+    ],
+    flow: CHAT_FLOW,
+    Content: ChatCard,
   },
 ];
