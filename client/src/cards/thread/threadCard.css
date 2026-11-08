@@ -1,0 +1,154 @@
+.thread-card {
+    display: grid;
+    gap: 0.75rem;
+}
+
+.thread-card-stage {
+    position: relative;
+    block-size: 9.75rem;
+    overflow: hidden;
+    border: 1px solid rgb(24 36 72 / 0.08);
+    border-radius: 1.25rem;
+    background-color: #ffffff;
+}
+
+.thread-card-canvas {
+    position: absolute;
+    inset: 0;
+}
+
+.thread-card-canvas canvas {
+    display: block;
+    inline-size: 100%;
+    block-size: 100%;
+}
+
+.thread-card-playback {
+    position: absolute;
+    inset-inline: 1rem;
+    inset-block-end: 0.75rem;
+    inline-size: calc(100% - 2rem);
+    block-size: 0.3125rem;
+    overflow: hidden;
+    border: 0;
+    border-radius: 999px;
+    background-color: #eef1f6;
+    appearance: none;
+}
+
+.thread-card-playback::-webkit-progress-bar {
+    border-radius: 999px;
+    background-color: #eef1f6;
+}
+
+.thread-card-playback::-webkit-progress-value {
+    border-radius: 999px;
+    background-color: #7a4dff;
+}
+
+.thread-card-playback::-moz-progress-bar {
+    border-radius: 999px;
+    background-color: #7a4dff;
+}
+
+.thread-card-compare {
+    justify-self: start;
+    min-inline-size: 12.5rem;
+    padding: 0.625rem 1.25rem;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    background-color: var(--color-accent);
+    color: #ffffff;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.thread-card-compare:hover {
+    background-color: #2449e0;
+}
+
+.thread-card-compare:disabled {
+    background-color: #e3e7f5;
+    color: #4b515c;
+    cursor: progress;
+}
+
+.thread-card-results {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+    gap: 0.75rem;
+}
+
+.thread-card-tile {
+    display: grid;
+    gap: 0.375rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid rgb(24 36 72 / 0.1);
+    border-radius: 1rem;
+    background-color: #ffffff;
+}
+
+.thread-card-tile[data-running='true'] {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px rgb(51 95 255 / 0.12);
+}
+
+.thread-card-tile-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.thread-card-tile-name {
+    margin: 0;
+    font-size: 0.9375rem;
+    font-weight: 700;
+}
+
+.thread-card-tile-badge {
+    padding: 0.0625rem 0.5rem;
+    border-radius: 999px;
+    background-color: #eef2ff;
+    color: #2449e0;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.thread-card-tile-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1rem;
+    margin: 0;
+    font-variant-numeric: tabular-nums;
+}
+
+.thread-card-tile-stats dd {
+    margin: 0;
+    font-weight: 600;
+}
+
+.thread-card-tile-freeze {
+    flex-basis: 100%;
+}
+
+.thread-card-tile-freeze dt {
+    color: #4b515c;
+    font-size: 0.8125rem;
+}
+
+.thread-card-tile-freeze dd {
+    font-size: 1.75rem;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+}
+
+.thread-card-tile-detail {
+    display: flex;
+    gap: 0.375rem;
+    font-size: 0.8125rem;
+}
+
+.thread-card-tile-detail dt {
+    color: #4b515c;
+}
