@@ -1,9 +1,18 @@
 import type { Request, Response } from 'express';
+import { measureEditDistance, splitIntoJamo } from './koreanText.ts';
 
 type Product = {
   readonly id: string;
   readonly name: string;
 };
+
+type NameDistance = {
+  readonly name: string;
+  readonly prefixDistance: number;
+  readonly fullDistance: number;
+};
+
+const JAMO_PER_ALLOWED_TYPO = 3;
 
 const ALL_PRODUCTS: readonly Product[] = [
   { id: 'apple', name: '사과' },
@@ -30,7 +39,9 @@ export function sendSearchResult(request: Request, response: Response) {
       return;
     }
 
-    response.json({ products: findProductsContaining(keyword) });
+    const products = findProductsContaining(keyword);
+    const suggestion = products.length === 0 ? suggestClosestName(keyword) : null;
+    response.json({ products, suggestion });
   }
 
   function cancelResult() {
@@ -39,11 +50,29 @@ export function sendSearchResult(request: Request, response: Response) {
 }
 
 function findProductsContaining(keyword: string): readonly Product[] {
-  if (keyword === '') {
-    return ALL_PRODUCTS;
-  }
+  const keywordJamo = splitIntoJamo(keyword);
 
   return ALL_PRODUCTS.filter(function hasKeyword(product) {
-    return product.name.includes(keyword);
+    return splitIntoJamo(product.name).includes(keywordJamo);
   });
+}
+
+function suggestClosestName(keyword: string): string | null {
+  const keywordJamo = splitIntoJamo(keyword);
+  const allowedTypos = Math.max(1, Math.floor(keywordJamo.length / JAMO_PER_ALLOWED_TYPO));
+  const closest = ALL_PRODUCTS.map(function measureName(product): NameDistance {
+    const nameJamo = splitIntoJamo(product.name);
+
+    return {
+      name: product.name,
+      prefixDistance: measureEditDistance(keywordJamo, nameJamo.slice(0, keywordJamo.length)),
+      fullDistance: measureEditDistance(keywordJamo, nameJamo),
+    };
+  }).sort(compareDistance)[0]!;
+
+  return closest.prefixDistance <= allowedTypos ? closest.name : null;
+}
+
+function compareDistance(first: NameDistance, second: NameDistance): number {
+  return first.prefixDistance - second.prefixDistance || first.fullDistance - second.fullDistance;
 }
