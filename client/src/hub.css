@@ -17,6 +17,24 @@
 }
 
 .hub-cards {
-    display: grid;
-    place-items: center;
+    --hub-gap: clamp(16px, 2vw, 32px);
+    --card-width: min(86vw, 360px);
+
+    display: flex;
+    flex-wrap: wrap;
+    align-content: center;
+    justify-content: center;
+    gap: var(--hub-gap);
+}
+
+@media (min-width: 640px) {
+    .hub-cards {
+        --card-width: min(340px, calc((100vw - 2rem - var(--hub-gap)) / 2));
+    }
+}
+
+@media (min-width: 1100px) {
+    .hub-cards {
+        --card-width: max(240px, min(380px, calc((100vw - 6rem - 3 * var(--hub-gap)) / 4), calc((100dvh - 200px) / 1.19)));
+    }
 }

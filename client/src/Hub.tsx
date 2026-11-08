@@ -1,5 +1,5 @@
-import { Card } from './cards/Card.tsx';
 import { CARD_LIST } from './cards/cardList.ts';
+import { Card } from './cards/frame/Card.tsx';
 import './hub.css';
 
 export function Hub() {

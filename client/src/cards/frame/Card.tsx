@@ -1,7 +1,9 @@
-import { useId, useLayoutEffect, useRef, useState } from 'react';
+import { Suspense, useId, useLayoutEffect, useRef, useState } from 'react';
 import type { ComponentType, SyntheticEvent } from 'react';
 import { flushSync } from 'react-dom';
 import './card.css';
+import { FlowDiagram } from './FlowDiagram.tsx';
+import type { DataFlow } from './FlowDiagram.tsx';
 
 export type CardEntry = {
   readonly id: string;
@@ -9,7 +11,9 @@ export type CardEntry = {
   readonly summary: string;
   readonly art: string;
   readonly icon: string;
-  readonly notes: string;
+  readonly tone: string;
+  readonly notes: readonly string[];
+  readonly flow: DataFlow;
   readonly Content: ComponentType;
 };
 
@@ -22,23 +26,29 @@ export function Card({ card }: CardProps) {
   const cardRef = useRef<HTMLButtonElement>(null);
 
   function openPanel() {
-    changeOpenState(true);
-  }
+    const cardElement = cardRef.current!;
+    cardElement.style.viewTransitionName = 'active-card';
 
-  function closePanel() {
-    changeOpenState(false);
-  }
-
-  function changeOpenState(nextIsOpen: boolean) {
-    runWithMorph(function applyOpenState() {
-      flushSync(function updateIsOpen() {
-        setIsOpen(nextIsOpen);
+    runWithMorph(function showPanel() {
+      cardElement.style.viewTransitionName = 'none';
+      flushSync(function markOpen() {
+        setIsOpen(true);
       });
-
-      if (!nextIsOpen) {
-        cardRef.current!.focus();
-      }
     });
+  }
+
+  async function closePanel() {
+    const cardElement = cardRef.current!;
+
+    await runWithMorph(function showCard() {
+      flushSync(function markClosed() {
+        setIsOpen(false);
+      });
+      cardElement.style.viewTransitionName = 'active-card';
+      cardElement.focus();
+    });
+
+    cardElement.style.viewTransitionName = 'none';
   }
 
   return (
@@ -55,7 +65,7 @@ export function Card({ card }: CardProps) {
         <img className="card-art" src={card.art} alt="" width="900" height="540" />
         <span className="card-body">
           <span className="card-head">
-            <CardIcon icon={card.icon} />
+            <CardIcon icon={card.icon} tone={card.tone} />
             <span className="card-title">{card.title}</span>
           </span>
           <span className="card-detail">
@@ -70,7 +80,7 @@ export function Card({ card }: CardProps) {
   );
 }
 
-function runWithMorph(applyChange: () => void) {
+async function runWithMorph(applyChange: () => void) {
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   if (prefersReducedMotion || !('startViewTransition' in document)) {
@@ -78,16 +88,17 @@ function runWithMorph(applyChange: () => void) {
     return;
   }
 
-  document.startViewTransition(applyChange);
+  await document.startViewTransition(applyChange).finished;
 }
 
 type CardIconProps = {
   readonly icon: string;
+  readonly tone: string;
 };
 
-function CardIcon({ icon }: CardIconProps) {
+function CardIcon({ icon, tone }: CardIconProps) {
   return (
-    <span className="card-icon">
+    <span className="card-icon" style={{ backgroundColor: tone }}>
       <img src={icon} alt="" />
     </span>
   );
@@ -99,6 +110,7 @@ type CardPanelProps = {
 };
 
 function CardPanel({ card, closePanel }: CardPanelProps) {
+  const [isShowingFlow, setIsShowingFlow] = useState(false);
   const panelRef = useRef<HTMLDialogElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
   const titleId = useId();
@@ -118,6 +130,10 @@ function CardPanel({ card, closePanel }: CardPanelProps) {
   function closeWithMorph(event: SyntheticEvent<HTMLDialogElement>) {
     event.preventDefault();
     closePanel();
+  }
+
+  function toggleFlow() {
+    setIsShowingFlow(!isShowingFlow);
   }
 
   return (
@@ -140,19 +156,39 @@ function CardPanel({ card, closePanel }: CardPanelProps) {
 
         <header className="card-panel-header">
           <h2 ref={titleRef} className="card-panel-title" id={titleId} tabIndex={-1}>
-            <CardIcon icon={card.icon} />
+            <CardIcon icon={card.icon} tone={card.tone} />
             {card.title}
           </h2>
+          <button
+            className="card-panel-flow"
+            type="button"
+            aria-pressed={isShowingFlow}
+            onClick={toggleFlow}
+          >
+            <svg className="card-panel-flow-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4 8h14m-4-4 4 4-4 4M20 16H6m4-4-4 4 4 4" />
+            </svg>
+            요청·응답
+          </button>
           <p className="card-panel-summary">{card.summary}</p>
         </header>
 
         <div className="card-panel-content">
-          <Content />
+          <div className="card-panel-demo" hidden={isShowingFlow}>
+            <Suspense fallback={<p className="card-panel-loading">불러오는 중…</p>}>
+              <Content />
+            </Suspense>
+          </div>
+          {isShowingFlow && <FlowDiagram flow={card.flow} />}
         </div>
 
         <details className="card-panel-notes">
           <summary>구현 이유 · 검증</summary>
-          <p>{card.notes}</p>
+          <ul className="card-panel-notes-list">
+            {card.notes.map(function renderNote(note) {
+              return <li key={note}>{note}</li>;
+            })}
+          </ul>
         </details>
       </div>
     </dialog>
