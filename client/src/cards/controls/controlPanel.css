@@ -1,0 +1,80 @@
+.control-panel {
+    border: 1px solid rgb(24 36 72 / 0.06);
+    border-radius: 0.875rem;
+    background-color: #f5f7fb;
+}
+
+.control-panel-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.875rem;
+    border-radius: 0.875rem;
+    font-size: 0.875rem;
+    cursor: pointer;
+}
+
+.control-panel-toggle:hover {
+    background-color: #eef1f6;
+}
+
+.control-panel-chevron {
+    flex: none;
+    inline-size: 1rem;
+    block-size: 1rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.control-panel[open] .control-panel-chevron {
+    transform: rotate(90deg);
+}
+
+.control-panel::details-content {
+    block-size: 0;
+    overflow: clip;
+}
+
+.control-panel[open]::details-content {
+    block-size: auto;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .control-panel {
+        interpolate-size: allow-keywords;
+    }
+
+    .control-panel::details-content {
+        transition:
+            block-size 0.28s cubic-bezier(0.2, 0, 0, 1),
+            content-visibility 0.28s allow-discrete;
+    }
+
+    .control-panel-chevron {
+        transition: transform 0.2s ease;
+    }
+}
+
+.control-panel-title {
+    flex: none;
+    font-weight: 700;
+}
+
+.control-panel-summary {
+    min-inline-size: 0;
+    overflow: hidden;
+    color: #5a606b;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.control-panel-body {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 1.5rem;
+    padding: 0.125rem 0.875rem 0.625rem;
+}

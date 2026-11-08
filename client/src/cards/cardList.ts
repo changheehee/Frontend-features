@@ -1,5 +1,9 @@
 import { lazy } from 'react';
 import type { CardEntry } from './frame/Card.tsx';
+import { PostCard } from './post/PostCard.tsx';
+import postArt from './post/postArt.png';
+import { POST_FLOW } from './post/postFlow.ts';
+import postIcon from './post/postIcon.svg';
 import { SearchCard } from './search/SearchCard.tsx';
 import searchArt from './search/searchArt.png';
 import { SEARCH_FLOW } from './search/searchFlow.ts';
@@ -46,5 +50,21 @@ export const CARD_LIST: readonly CardEntry[] = [
     ],
     flow: THREAD_FLOW,
     Content: ThreadCard,
+  },
+  {
+    id: 'post',
+    title: '게시글',
+    summary: '글 1만 개를 끝없이 불러와도 화면에는 보이는 행만 그립니다.',
+    art: postArt,
+    icon: postIcon,
+    tone: '#d6336c',
+    notes: [
+      '목록 끝 200px 전에 다음 페이지를 불러오고, 실패하면 다시 시도로만 재요청합니다.',
+      '보이는 행만 그리고, ‘전부’로 바꾸면 그리는 시간과 스크롤 중 멈춤을 비교할 수 있습니다.',
+      '하트는 화면부터 바꾸고, 저장에 실패하면 되돌린 뒤 알려 줍니다.',
+      '사진: Unsplash 무료 사진',
+    ],
+    flow: POST_FLOW,
+    Content: PostCard,
   },
 ];
