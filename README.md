@@ -1,4 +1,4 @@
-# carrot-hub
+# Frontend-features
 
 React와 Express로 만든 프론트엔드 기능 모음입니다.
 
