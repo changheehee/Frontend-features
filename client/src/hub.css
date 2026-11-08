@@ -6,6 +6,13 @@
     padding-inline: 1rem;
 }
 
+.hub-heading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.375rem;
+}
+
 .hub-title {
     margin: 0;
     color: #5a606b;
@@ -13,6 +20,45 @@
     font-weight: 600;
     letter-spacing: -0.01em;
     text-align: center;
+    word-break: keep-all;
+}
+
+.hub-info {
+    display: grid;
+    place-items: center;
+    inline-size: 1.125rem;
+    block-size: 1.125rem;
+    padding: 0;
+    border: 1px solid #b4bac4;
+    border-radius: 999px;
+    background-color: #ffffff;
+    color: #5a606b;
+    font-size: 0.6875rem;
+    font-weight: 800;
+    line-height: 1;
+    cursor: pointer;
+    anchor-name: --hub-info;
+}
+
+.hub-info:hover {
+    border-color: #5a606b;
+    color: var(--color-text);
+}
+
+.hub-info-tip {
+    position-anchor: --hub-info;
+    position-area: bottom;
+    inset: auto;
+    max-inline-size: 17rem;
+    margin: 0.5rem 0 0;
+    padding: 0.625rem 0.875rem;
+    border: 0;
+    border-radius: 0.75rem;
+    background-color: #1c1f24;
+    box-shadow: 0 10px 24px -12px rgb(24 36 72 / 0.5);
+    color: #ffffff;
+    font-size: 0.8125rem;
+    line-height: 1.5;
     word-break: keep-all;
 }
 
