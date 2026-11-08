@@ -4,9 +4,10 @@ import { CARD_LIST } from './cardList.ts';
 const PORT = 3001;
 
 const app = express();
+app.use(express.json());
 
 for (const card of CARD_LIST) {
-  app.get(`/api/${card.id}`, card.sendResponse);
+  app[card.method](`/api/${card.path}`, card.sendResponse);
 }
 
 app.listen(PORT, announceServerStarted);
