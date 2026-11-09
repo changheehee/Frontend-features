@@ -1,7 +1,17 @@
 @echo off
-start "carrot-hub server" /d "%~dp0server" cmd /k npm run dev
-echo Waiting for the server on port 3001...
-:waitForServer
-powershell -NoProfile -Command "try { $client = [Net.Sockets.TcpClient]::new('127.0.0.1', 3001); $client.Close(); exit 0 } catch { Start-Sleep -Milliseconds 300; exit 1 }"
-if errorlevel 1 goto waitForServer
-start "carrot-hub client" /d "%~dp0client" cmd /k npm run dev
+setlocal
+where node >nul 2>&1 || goto :missingNode
+node "%~dp0scripts\start.mjs" %*
+set "launcherExitCode=%errorlevel%"
+if not "%launcherExitCode%"=="0" pause
+exit /b %launcherExitCode%
+
+:missingNode
+chcp 65001 >nul
+rem 이 파일은 UTF-8이라, 코드 페이지를 바꾼 뒤에 읽히는 줄부터 한글이 깨지지 않는다.
+echo.
+echo   Node.js를 찾을 수 없어요.
+echo   https://nodejs.org 에서 LTS 버전을 설치한 뒤 다시 실행해 주세요.
+echo.
+pause
+exit /b 1

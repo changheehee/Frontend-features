@@ -18,7 +18,9 @@ React·TypeScript를 사용했고, Express 서버와 연결했습니다.
 * 터미널을 두 개 열어 각 폴더에서 `npm run dev`
 * [localhost:5173](http://localhost:5173) 접속
 
-Windows에서는 설치 후 `start.cmd`로 함께 실행할 수 있습니다. 개발자 도구의 Console에서 요청·응답 로그를 볼 수 있습니다.
+Windows에서는 `start.cmd` 하나로 실행할 수 있습니다. 패키지 설치, Node.js 버전 확인, 포트 정리까지 알아서 한 뒤 서버와 클라이언트를 띄우고 브라우저를 엽니다. 옵션은 `start.cmd --help`로 볼 수 있습니다.
+
+개발자 도구의 Console에서 요청·응답 로그를 볼 수 있습니다.
 
 ## 참고
 
